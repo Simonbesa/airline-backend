@@ -10,7 +10,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: airline-backend
+      MONGO_INITDB_DATABASE: airline
     volumes:
       - mongodb_data:/data/db
       - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
