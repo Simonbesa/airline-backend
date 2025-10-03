@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, IsOptional } from 'class-validator';
 import type { Passenger } from '../schemas/flight.schema';
 
 export class CreateFlightDto {
@@ -6,5 +6,7 @@ export class CreateFlightDto {
   @IsNotEmpty()
   flightCode: string;
 
-  passengers: Passenger[] = [];
+  @IsArray()
+  @IsOptional()
+  passengers?: Passenger[];
 }
