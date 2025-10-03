@@ -1,0 +1,304 @@
+import axios from 'axios';
+import prepareDatabase from '../plugins/prepare-database';
+import { CreateFlightDto } from 'src/flights/dto/create-flight.dto';
+import { FlightCategory } from 'src/flights/enum/flight-category.enum';
+import { Flight } from 'src/flights/schemas/flight.schema';
+
+const postFlight = async (body: CreateFlightDto): Promise<Flight> => {
+  const health = await axios.get('http://localhost:3000');
+  console.log('Health check:', health.status, health.data);
+
+  try {
+    const response = await axios.post('http://localhost:3000/flights', body, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error posting flight:', error);
+    throw error;
+  }
+};
+
+describe('POST /flight', () => {
+  it('should create a flight', async () => {
+    // ARRANGE
+    const documents: Record<string, any> = {
+      flights: [{ flightCode: 1234, passengers: [] }],
+      // passengers: [
+      //   [
+      //     {
+      //       id: 139577,
+      //       name: 'Martín Alvarez',
+      //       hasConnections: false,
+      //       age: 2,
+      //       flightCategory: 'Gold',
+      //       reservationId: '8ZC5KYVK',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 530874,
+      //       name: 'Jorge Hernández',
+      //       hasConnections: false,
+      //       age: 16,
+      //       flightCategory: 'Black',
+      //       reservationId: 'O2DQ3SZS',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 426098,
+      //       name: 'Pedro Ruiz',
+      //       hasConnections: false,
+      //       age: 33,
+      //       flightCategory: 'Black',
+      //       reservationId: 'KSXXOALO',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 757837,
+      //       name: 'Paola Vargas',
+      //       hasConnections: true,
+      //       age: 48,
+      //       flightCategory: 'Platinum',
+      //       reservationId: '8ZC5KYVK',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 366477,
+      //       name: 'Juan Ortega',
+      //       hasConnections: true,
+      //       age: 75,
+      //       flightCategory: 'Platinum',
+      //       reservationId: 'RPT8LU2M',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 825792,
+      //       name: 'Jorge Vargas',
+      //       hasConnections: true,
+      //       age: 37,
+      //       flightCategory: 'Black',
+      //       reservationId: '8ZC5KYVK',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 668601,
+      //       name: 'Paola Hernández',
+      //       hasConnections: true,
+      //       age: 30,
+      //       flightCategory: 'Black',
+      //       reservationId: 'RPT8LU2M',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 245409,
+      //       name: 'Carlos González',
+      //       hasConnections: true,
+      //       age: 34,
+      //       flightCategory: 'Normal',
+      //       reservationId: 'RPT8LU2M',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 610771,
+      //       name: 'Ricardo Ruiz',
+      //       hasConnections: true,
+      //       age: 9,
+      //       flightCategory: 'Gold',
+      //       reservationId: 'KSXXOALO',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 139485,
+      //       name: 'Martín Ruiz',
+      //       hasConnections: false,
+      //       age: 41,
+      //       flightCategory: 'Gold',
+      //       reservationId: 'KSXXOALO',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 552697,
+      //       name: 'Ana Fernández',
+      //       hasConnections: true,
+      //       age: 18,
+      //       flightCategory: 'Gold',
+      //       reservationId: '426OMP5O',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 620159,
+      //       name: 'Valentina Pérez',
+      //       hasConnections: false,
+      //       age: 56,
+      //       flightCategory: 'Normal',
+      //       reservationId: 'FKY4HRMH',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 120718,
+      //       name: 'Paola Díaz',
+      //       hasConnections: true,
+      //       age: 5,
+      //       flightCategory: 'Platinum',
+      //       reservationId: '8ZC5KYVK',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 953815,
+      //       name: 'Javier Silva',
+      //       hasConnections: false,
+      //       age: 44,
+      //       flightCategory: 'Gold',
+      //       reservationId: '2ZOTLIVZ',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 164557,
+      //       name: 'Valentina Navarro',
+      //       hasConnections: false,
+      //       age: 43,
+      //       flightCategory: 'Black',
+      //       reservationId: 'RPT8LU2M',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 566203,
+      //       name: 'Luis Ríos',
+      //       hasConnections: true,
+      //       age: 16,
+      //       flightCategory: 'Normal',
+      //       reservationId: 'S05KSFJ6',
+      //       hasCheckedBaggage: false,
+      //     },
+      //     {
+      //       id: 550014,
+      //       name: 'Camila Rodríguez',
+      //       hasConnections: true,
+      //       age: 53,
+      //       flightCategory: 'Black',
+      //       reservationId: '8ZC5KYVK',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 371528,
+      //       name: 'Valentina Pérez',
+      //       hasConnections: false,
+      //       age: 13,
+      //       flightCategory: 'Normal',
+      //       reservationId: 'UAN6K7Q8',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 963762,
+      //       name: 'Luis Ortega',
+      //       hasConnections: true,
+      //       age: 20,
+      //       flightCategory: 'Platinum',
+      //       reservationId: '5PLUY0UN',
+      //       hasCheckedBaggage: true,
+      //     },
+      //     {
+      //       id: 241222,
+      //       name: 'Luis Fernández',
+      //       hasConnections: false,
+      //       age: 11,
+      //       flightCategory: 'Black',
+      //       reservationId: 'KSXXOALO',
+      //       hasCheckedBaggage: false,
+      //     },
+      //   ],
+      // ],
+    };
+    await prepareDatabase.run(documents);
+    const body: CreateFlightDto = {
+      flightCode: 'FL123',
+      passengers: [
+        {
+          id: 1,
+          name: 'Test Passenger 1',
+          hasConnections: true,
+          age: 10,
+          flightCategory: FlightCategory.Black,
+          reservationId: 'reservation1',
+          hasCheckedBaggage: true,
+        },
+        {
+          id: 2,
+          name: 'Test Passenger 2',
+          hasConnections: true,
+          age: 20,
+          flightCategory: FlightCategory.Normal,
+          reservationId: 'reservation2',
+          hasCheckedBaggage: true,
+        },
+      ],
+    };
+
+    // ACT
+    const createdFlight = await postFlight(body);
+
+    // ASSERT
+    expect(createdFlight.flightCode).toBe('FL123');
+    expect(createdFlight.passengers).toHaveLength(2);
+    expect(createdFlight.passengers[0].name).toBe('Test Passenger 1');
+    expect(createdFlight.passengers[0].flightCategory).toBe(
+      FlightCategory.Black,
+    );
+    expect(createdFlight.passengers[1].name).toBe('Test Passenger 2');
+    expect(createdFlight.passengers[1].flightCategory).toBe(
+      FlightCategory.Normal,
+    );
+    expect(createdFlight).toHaveProperty('createdAt');
+    expect(createdFlight).toHaveProperty('updatedAt');
+  });
+  it('should fail to create a flight with duplicate flightCode', async () => {
+    // ARRANGE
+    const documents: Record<string, any> = {
+      flights: [{ flightCode: 'FL123', passengers: [] }],
+    };
+    await prepareDatabase.run(documents);
+    const body: CreateFlightDto = {
+      flightCode: 'FL123', // Duplicate flightCode
+      passengers: [],
+    };
+
+    // ACT & ASSERT
+    await expect(postFlight(body)).rejects.toThrow();
+  });
+  it('should fail to create a flight with duplicate passengers ids', async () => {
+    // ARRANGE
+    const documents: Record<string, any> = {
+      flights: [{ flightCode: 'FL123', passengers: [] }],
+    };
+    await prepareDatabase.run(documents);
+    const body: CreateFlightDto = {
+      flightCode: 'FL2',
+      passengers: [
+        {
+          id: 1,
+          name: 'Test Passenger 1',
+          hasConnections: true,
+          age: 10,
+          flightCategory: FlightCategory.Black,
+          reservationId: 'reservation1',
+          hasCheckedBaggage: true,
+        },
+        {
+          id: 1,
+          name: 'Test Passenger 2',
+          hasConnections: true,
+          age: 20,
+          flightCategory: FlightCategory.Normal,
+          reservationId: 'reservation2',
+          hasCheckedBaggage: true,
+        },
+      ],
+    };
+
+    // ACT & ASSERT
+    await expect(postFlight(body)).rejects.toThrow();
+  });
+});
