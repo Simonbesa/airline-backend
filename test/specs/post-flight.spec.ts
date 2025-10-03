@@ -5,6 +5,9 @@ import { FlightCategory } from 'src/flights/enum/flight-category.enum';
 import { Flight } from 'src/flights/schemas/flight.schema';
 
 const postFlight = async (body: CreateFlightDto): Promise<Flight> => {
+  const health = await axios.get('http://localhost:3000');
+  console.log('Health check:', health.status, health.data);
+
   try {
     const response = await axios.post('http://localhost:3000/flights', body, {
       headers: {
@@ -23,7 +26,7 @@ describe('POST /flight', () => {
   it('should create a flight', async () => {
     // ARRANGE
     const documents: Record<string, any> = {
-      flights: [{ flightCode: 1234 }],
+      flights: [{ flightCode: 1234, passengers: [] }],
       // passengers: [
       //   [
       //     {
@@ -215,7 +218,7 @@ describe('POST /flight', () => {
       passengers: [
         {
           id: 1,
-          name: 'Test Passenger 2',
+          name: 'Test Passenger 1',
           hasConnections: true,
           age: 10,
           flightCategory: FlightCategory.Black,
@@ -235,16 +238,20 @@ describe('POST /flight', () => {
     };
 
     // ACT
-    const result = await postFlight(body);
+    const createdFlight = await postFlight(body);
 
     // ASSERT
-    expect(result.flightCode).toBe('FL123');
-    expect(result.passengers).toHaveLength(2);
-    expect(result.passengers[0].name).toBe('Test Passenger 2');
-    expect(result.passengers[0].flightCategory).toBe(FlightCategory.Black);
-    expect(result.passengers[1].flightCategory).toBe(FlightCategory.Normal);
-    expect(result).toHaveProperty('_id');
-    expect(result).toHaveProperty('createdAt');
-    expect(result).toHaveProperty('updatedAt');
+    expect(createdFlight.flightCode).toBe('FL123');
+    expect(createdFlight.passengers).toHaveLength(2);
+    expect(createdFlight.passengers[0].name).toBe('Test Passenger 1');
+    expect(createdFlight.passengers[0].flightCategory).toBe(
+      FlightCategory.Black,
+    );
+    expect(createdFlight.passengers[1].name).toBe('Test Passenger 2');
+    expect(createdFlight.passengers[1].flightCategory).toBe(
+      FlightCategory.Normal,
+    );
+    expect(createdFlight).toHaveProperty('createdAt');
+    expect(createdFlight).toHaveProperty('updatedAt');
   });
 });

@@ -38,11 +38,13 @@ The API will be available at `http://localhost:3000`
 
 | Method     | Endpoint         | Description                             |
 | ---------- | ---------------- | --------------------------------------- |
-| `GET`    | `/flights`     | Get all flights with optional filtering |
 | `POST`   | `/flights`     | Create a new flight                     |
-| `GET`    | `/flights/:id` | Get flight by ID                        |
-| `PATCH`  | `/flights/:id` | Update flight by ID                     |
-| `DELETE` | `/flights/:id` | Delete flight by ID                     |
+| `GET`    | `/flights`     | Get all flights with optional filtering |
+| `GET`    | `/flights/:flightCode` | Get flight by flightCode  |
+| `PATCH`  | `/flights/add-passengers/:flightCode` | Add passengers to a flight |
+| `PATCH`  | `/flights/update-passengers/:flightCode` | Update flight passengers |
+| `PATCH`  | `/flights/delete-passengers/:flightCode` | Delete passengers from a flight |
+| `DELETE` | `/flights/:flightCode` | Delete flight by ID |
 
 ### Example Requests
 
@@ -67,6 +69,8 @@ curl -X POST http://localhost:3000/flights \
   }'
 ```
 
+For the next requests, to be useful, one or more flights should have been created first
+
 #### Get All Flights
 
 ```bash
@@ -87,16 +91,15 @@ curl "http://localhost:3000/flights?passengerName=John"
 
 ### Local Development
 
+Use a .env file with the required environment variables, use this variables to start:
+
+PORT=3000
+DATABASE_URI=mongodb://admin:password123@localhost:27017/airline?authSource=admin
+NODE_ENV=development
+
+Then you need to run the services stack:
+
 ```bash
-# Format code
-npm run format
-
-# Run linting
-npm run lint
-
-# Build the application
-npm run build
-
 # Before starting it is important to have the database running
 docker-compose -f docker-compose.mongo-only.yml up -d
 
@@ -136,12 +139,12 @@ The project includes Docker configuration for both development and production:
 - **Host**: `localhost:27017`
 - **Username**: `admin`
 - **Password**: `password123`
-- **Database**: `airline-backend`
+- **Database**: `airline`
 
 ### Connection String
 
 ```
-mongodb://admin:password123@localhost:27017/airline-backend?authSource=admin
+mongodb://admin:password123@localhost:27017/airline?authSource=admin
 ```
 
 ## 🔧 Environment Variables
@@ -151,7 +154,7 @@ Create a `local.env` file based on `.env.example`:
 ```env
 PORT=3000
 NODE_ENV=development
-DATABASE_URI=mongodb://admin:password123@localhost:27017/airline-backend?authSource=admin
+DATABASE_URI=mongodb://admin:password123@localhost:27017/airline?authSource=admin
 ```
 
 ## 🧪 Testing
@@ -165,8 +168,33 @@ npm run test:watch
 
 # Run test coverage
 npm run test:cov
+```
 
-# Run e2e tests
+### e2e tests
+
+There are two suggested ways of running e2e tests:
+
+#### full containerized
+
+```bash
+npm run test:e2e:docker
+```
+
+#### Separated on different contexts
+
+Open a terminal to start up the services
+
+```bash
+# Mongodb in a docker container
+npm run start:docker:database
+
+# Then serve the app
+npm run start:dev
+```
+
+Open a new terminal to run the tests
+
+```bash
 npm run test:e2e
 ```
 
@@ -213,6 +241,8 @@ airline-backend-api@0.0.1 start:dev
 nest start --watch
 
 Error EACCES: permission denied, unlink '/path/to/repo/dist/app.controller.d.ts'
+
+Solution:
 
 ```bash
 sudo chown -R $USER:$USER dist/

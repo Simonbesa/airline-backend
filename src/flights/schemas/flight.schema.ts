@@ -8,7 +8,7 @@ import { FlightCategory } from '../enum/flight-category.enum';
 
 @SchemaDecorator({ _id: false })
 export class Passenger {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   id: number;
 
   @Prop({ required: true })

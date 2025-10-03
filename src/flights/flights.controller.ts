@@ -12,7 +12,11 @@ import {
 } from '@nestjs/common';
 import { FlightsService } from './flights.service';
 import { CreateFlightDto } from './dto/create-flight.dto';
-import { UpdateFlightDto } from './dto/update-flight.dto';
+import {
+  UpdateFlightPassengersInputDto,
+  AddFlightPassengersInputDto,
+  DeleteFlightPassengersInputDto,
+} from './dto/update-flight.dto';
 import { Flight } from './schemas/flight.schema';
 import { FindFlightsQueryDto } from './dto/find-flights-query.dto';
 
@@ -22,9 +26,11 @@ export class FlightsController {
 
   @Post()
   async create(@Body() createFlightDto: CreateFlightDto): Promise<Flight> {
+    // We are assuming the the client side will use 'flightCode' as the unique identifier, otherwise the request is going to fail
     return this.flightsService.create(createFlightDto);
   }
 
+  // TODO: paginate
   @Get()
   async findFlights(@Query() query: FindFlightsQueryDto): Promise<Flight[]> {
     return this.flightsService.findFlights(query);
@@ -35,12 +41,28 @@ export class FlightsController {
     return this.flightsService.getFlight(flightCode);
   }
 
-  @Patch(':flightCode')
-  async update(
+  @Patch('add-passengers/:flightCode')
+  async addPassengers(
     @Param('flightCode') flightCode: string,
-    @Body() updateFlightDto: UpdateFlightDto,
+    @Body() { passengers }: AddFlightPassengersInputDto,
   ): Promise<Flight> {
-    return this.flightsService.update(flightCode, updateFlightDto);
+    return this.flightsService.addPassengers(flightCode, passengers);
+  }
+
+  @Patch('update-passengers/:flightCode')
+  async updatePassengers(
+    @Param('flightCode') flightCode: string,
+    @Body() { passengers }: UpdateFlightPassengersInputDto,
+  ): Promise<Flight> {
+    return this.flightsService.updatePassengers(flightCode, passengers);
+  }
+
+  @Patch('delete-passengers/:flightCode')
+  async deletePassengers(
+    @Param('flightCode') flightCode: string,
+    @Body() { passengerIds }: DeleteFlightPassengersInputDto,
+  ): Promise<Flight> {
+    return this.flightsService.deletePassengers(flightCode, passengerIds);
   }
 
   @Delete(':flightCode')
