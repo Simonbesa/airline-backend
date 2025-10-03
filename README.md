@@ -26,7 +26,7 @@ cp .env.example local.env
 # Edit local.env with your configuration
 
 # Start Nest app and MongoDB
-docker-compose up --build
+sudo docker-compose up --build
 
 ```
 
@@ -88,20 +88,20 @@ curl "http://localhost:3000/flights?passengerName=John"
 ### Local Development
 
 ```bash
-# Build the application
-npm run build
-
-# Start in development mode with hot reload
-npm run start:dev
-
-# Start in production mode
-npm run start:prod
-
 # Format code
 npm run format
 
 # Run linting
 npm run lint
+
+# Build the application
+npm run build
+
+# Before starting it is important to have the database running
+docker-compose -f docker-compose.mongo-only.yml up -d
+
+# Start in development mode with hot reload
+npm run start:dev
 ```
 
 ### Development with Docker
@@ -202,4 +202,18 @@ sudo usermod -aG docker $USER
 
 # Restart session or use newgrp
 newgrp docker
+```
+
+**Permission denied (dist)**
+
+case:
+npm run start:dev
+
+airline-backend-api@0.0.1 start:dev
+nest start --watch
+
+Error EACCES: permission denied, unlink '/path/to/repo/dist/app.controller.d.ts'
+
+```bash
+sudo chown -R $USER:$USER dist/
 ```
