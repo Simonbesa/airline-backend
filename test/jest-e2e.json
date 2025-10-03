@@ -10,5 +10,6 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
     "detectOpenHandles": true,
-  "testTimeout": 30000
+  "testTimeout": 30000,
+  "maxWorkers": 1
 }

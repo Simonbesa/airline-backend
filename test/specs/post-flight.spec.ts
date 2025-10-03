@@ -254,4 +254,51 @@ describe('POST /flight', () => {
     expect(createdFlight).toHaveProperty('createdAt');
     expect(createdFlight).toHaveProperty('updatedAt');
   });
+  it('should fail to create a flight with duplicate flightCode', async () => {
+    // ARRANGE
+    const documents: Record<string, any> = {
+      flights: [{ flightCode: 'FL123', passengers: [] }],
+    };
+    await prepareDatabase.run(documents);
+    const body: CreateFlightDto = {
+      flightCode: 'FL123', // Duplicate flightCode
+      passengers: [],
+    };
+
+    // ACT & ASSERT
+    await expect(postFlight(body)).rejects.toThrow();
+  });
+  it('should fail to create a flight with duplicate passengers ids', async () => {
+    // ARRANGE
+    const documents: Record<string, any> = {
+      flights: [{ flightCode: 'FL123', passengers: [] }],
+    };
+    await prepareDatabase.run(documents);
+    const body: CreateFlightDto = {
+      flightCode: 'FL2',
+      passengers: [
+        {
+          id: 1,
+          name: 'Test Passenger 1',
+          hasConnections: true,
+          age: 10,
+          flightCategory: FlightCategory.Black,
+          reservationId: 'reservation1',
+          hasCheckedBaggage: true,
+        },
+        {
+          id: 1,
+          name: 'Test Passenger 2',
+          hasConnections: true,
+          age: 20,
+          flightCategory: FlightCategory.Normal,
+          reservationId: 'reservation2',
+          hasCheckedBaggage: true,
+        },
+      ],
+    };
+
+    // ACT & ASSERT
+    await expect(postFlight(body)).rejects.toThrow();
+  });
 });

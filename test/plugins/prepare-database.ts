@@ -27,8 +27,14 @@ const updateDatabaseDocuments = async (
   db: Db,
   documents: Record<string, readonly OptionalId<Document>[]>,
 ) => {
+  // Clear all collections first
+  const collections = await db.collections();
+  for (const collection of collections) {
+    await collection.deleteMany({});
+  }
+
+  // Then insert the specified documents
   for (const collectionName of Object.keys(documents)) {
-    await db.collection(collectionName).deleteMany({});
     if (documents[collectionName].length > 0) {
       await db.collection(collectionName).insertMany(documents[collectionName]);
     }

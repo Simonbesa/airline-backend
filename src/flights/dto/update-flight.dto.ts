@@ -6,9 +6,41 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
 import { FlightCategory } from '../enum/flight-category.enum';
-import { Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
+
+export class PassengerInput {
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  hasConnections: boolean;
+
+  @IsNotEmpty()
+  @IsNumber()
+  age: number;
+
+  @IsNotEmpty()
+  @IsEnum(FlightCategory)
+  flightCategory: FlightCategory;
+
+  @IsNotEmpty()
+  @IsString()
+  reservationId: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  hasCheckedBaggage: boolean;
+}
 
 export class PassengerUpdates implements Partial<Omit<Passenger, 'id'>> {
   @IsNotEmpty()
@@ -41,16 +73,21 @@ export class PassengerUpdates implements Partial<Omit<Passenger, 'id'>> {
 }
 
 export class UpdateFlightPassengersInputDto {
-  @Transform(({ value }): PassengerUpdates[] => value || [])
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PassengerUpdates)
   passengers: PassengerUpdates[];
 }
 
 export class AddFlightPassengersInputDto {
-  @Transform(({ value }): Passenger[] => value || [])
-  passengers: Passenger[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PassengerInput)
+  passengers: PassengerInput[];
 }
 
 export class DeleteFlightPassengersInputDto {
-  @Transform(({ value }): number[] => value || [])
+  @IsArray()
+  @IsNumber({}, { each: true })
   passengerIds: number[];
 }

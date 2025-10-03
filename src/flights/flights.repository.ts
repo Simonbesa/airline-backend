@@ -135,11 +135,17 @@ export class FlightsRepository {
     flightCode: string,
     updatePassengers: Partial<Passenger>[],
   ): Promise<Flight | null> {
+    // Build array filters for each passenger to update
+    const arrayFilters = updatePassengers.map((passenger, index) => ({
+      [`elem${index}.id`]: passenger.id,
+    }));
+
+    // Build the update object
     const updates = updatePassengers.reduce<Record<string, unknown>>(
-      (acc, passenger) => {
+      (acc, passenger, index) => {
         Object.keys(passenger).forEach((key) => {
           if (key !== 'id' && passenger[key] !== undefined) {
-            acc[`passengers.$[elem].${key}`] = passenger[key];
+            acc[`passengers.$[elem${index}].${key}`] = passenger[key];
           }
         });
         return acc;
@@ -157,6 +163,7 @@ export class FlightsRepository {
         'passengers.id': { $in: updatePassengers.map((p) => p.id) },
       },
       { $set: updates },
+      { arrayFilters },
     );
     return this.flightModel.findOne({ flightCode }).exec();
   }

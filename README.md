@@ -69,7 +69,8 @@ curl -X POST http://localhost:3000/flights \
   }'
 ```
 
-For the next requests, to be useful, one or more flights should have been created first
+For the next requests, to be useful, one or more flights should have been created first.
+Take on account that the previous creation works just once, more attempts will return duplication error because the flightCode is an unique field.
 
 #### Get All Flights
 
@@ -81,7 +82,7 @@ curl http://localhost:3000/flights
 
 ```bash
 # By passenger category
-curl "http://localhost:3000/flights?passengerCategory=Gold"
+curl "http://localhost:3000/flights/1234?passengerCategory=Gold"
 
 # By passenger name
 curl "http://localhost:3000/flights?passengerName=John"
